@@ -1,5 +1,10 @@
-{ pkgs, ruby, bundler, nix, nix-prefetch-git }:
-
+{
+  pkgs ? (import <nixpkgs> {}),
+  ruby ? pkgs.ruby,
+  bundler ? (pkgs.bundler.override { inherit ruby; }),
+  nix ? pkgs.nix,
+  nix-prefetch-git ? pkgs.nix-prefetch-git,
+}:
 pkgs.stdenv.mkDerivation rec {
   version = "0.0.6";
   name = "bundix";
@@ -8,7 +13,7 @@ pkgs.stdenv.mkDerivation rec {
   installPhase = ''
     mkdir -p $out
     makeWrapper $src/bin/bundix $out/bin/bundix \
-      --prefix PATH : "${nix.out}/bin" \
+      --suffix PATH : "${nix.out}/bin" \
       --prefix PATH : "${nix-prefetch-git.out}/bin" \
       --prefix PATH : "${bundler.out}/bin" \
       --prefix PATH : "${ruby}/bin" \
